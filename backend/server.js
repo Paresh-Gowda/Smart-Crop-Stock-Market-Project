@@ -21,14 +21,10 @@ app.get("/api/health", (req, res) => {
 // --------------------
 app.get("/api/market-prices", async (req, res) => {
   try {
-    const {
-    state,
-    district,
-    market,
-    commodity,
-    limit = 20,
-    offset = 0,
-  } = req.query;
+    const { state, district, market, commodity } = req.query;
+
+    const limit = Math.min(Number(req.query.limit) || 20, 100);
+    const offset = Math.max(Number(req.query.offset) || 0, 0);
     const params = {
       "api-key": process.env.DATA_GOV_API_KEY,
       format: "json",
@@ -66,11 +62,11 @@ app.get("/api/market-prices", async (req, res) => {
       modalPrice: item.modal_price,
     }));
     res.json({
-    count: cleanData.length,
-    limit: Number(limit),
-    offset: Number(offset),
-    data: cleanData,
-  });
+      count: cleanData.length,
+      limit: Number(limit),
+      offset: Number(offset),
+      data: cleanData,
+    });
   } catch (error) {
     console.error("Mandi API Error:", error.message);
     res.status(500).json({
@@ -80,4 +76,57 @@ app.get("/api/market-prices", async (req, res) => {
 });
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+});
+// --------------------
+// Get Historical Prices
+// --------------------
+app.get("/api/market-history", async (req, res) => {
+  try {
+    const { commodity, market, state, limit = 30 } = req.query;
+    if (!commodity) {
+      return res.status(400).json({
+        message: "Commodity is required",
+      });
+    }
+    const params = {
+      "api-key": process.env.DATA_GOV_API_KEY,
+      format: "json",
+      limit,
+    };
+    params["filters[commodity]"] = commodity;
+    if (market) {
+      params["filters[market]"] = market;
+    }
+    if (state) {
+      params["filters[state.keyword]"] = state;
+    }
+    const response = await axios.get(MANDI_API_URL, {
+      params,
+    });
+    const records = response.data.records || [];
+    const history = records
+      .map((item) => ({
+        date: item.arrival_date,
+        price: item.modal_price,
+        minPrice: item.min_price,
+        maxPrice: item.max_price,
+        market: item.market,
+      }))
+      .sort((a, b) => {
+        const dateA = a.date.split("/").reverse().join("-");
+        const dateB = b.date.split("/").reverse().join("-");
+        return new Date(dateA) - new Date(dateB);
+      });
+    res.json({
+      commodity,
+      market: market || "All Markets",
+      count: history.length,
+      history,
+    });
+  } catch (error) {
+    console.error("Market History Error:", error.message);
+    res.status(500).json({
+      message: "Failed to fetch historical market data",
+    });
+  }
 });

@@ -3,31 +3,34 @@ function MarketFactors() {
     {
       icon: "🌧️",
       name: "Rainfall",
-      status: "Favorable",
-      type: "positive",
+      status: "Monitor",
+      type: "neutral",
     },
     {
       icon: "📦",
       name: "Supply",
-      status: "Moderate",
+      status: "Market Data",
       type: "neutral",
     },
     {
       icon: "📈",
       name: "Demand",
-      status: "High",
-      type: "positive",
+      status: "Market Data",
+      type: "neutral",
     },
     {
       icon: "🚢",
       name: "Exports",
-      status: "Strong",
-      type: "positive",
+      status: "Market Data",
+      type: "neutral",
     },
   ];
   return (
     <section className="market-factors">
       <h2>🌦️ Market Factors</h2>
+      <p className="factors-description">
+        Factors that can influence agricultural commodity prices.
+      </p>
       <div className="factors-list">
         {factors.map((factor) => (
           <div className="factor-item" key={factor.name}>

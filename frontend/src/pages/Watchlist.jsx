@@ -1,9 +1,15 @@
-import cropData from "../data/cropData";
+import { useEffect, useState } from "react";
 function Watchlist() {
-  // Temporary mock watchlist
-  const watchlist = cropData.filter((crop) =>
-    ["Wheat", "Cotton", "Soybean"].includes(crop.name),
-  );
+  const [watchlist, setWatchlist] = useState(() => {
+    const saved = localStorage.getItem("cropWatchlist");
+    return saved ? JSON.parse(saved) : [];
+  });
+  useEffect(() => {
+    localStorage.setItem("cropWatchlist", JSON.stringify(watchlist));
+  }, [watchlist]);
+  const removeFromWatchlist = (id) => {
+    setWatchlist((current) => current.filter((crop) => crop.id !== id));
+  };
   return (
     <main className="watchlist-page">
       <section className="page-header">
@@ -11,23 +17,32 @@ function Watchlist() {
         <h1>My Watchlist ⭐</h1>
         <span>Keep track of your favorite agricultural commodities</span>
       </section>
-      <section className="watchlist-container">
-        {watchlist.map((crop) => (
-          <div className="watchlist-item" key={crop.id}>
-            <div>
-              <h3>{crop.name}</h3>
-              <span>{crop.symbol}</span>
+      {watchlist.length === 0 ? (
+        <div className="empty-watchlist">
+          <h2>Your watchlist is empty 🌾</h2>
+          <p>Add crops from the Dashboard to keep track of them.</p>
+        </div>
+      ) : (
+        <section className="watchlist-container">
+          {watchlist.map((crop) => (
+            <div className="watchlist-item" key={crop.id}>
+              <div>
+                <h3>{crop.name}</h3>
+                <span>{crop.symbol}</span>
+              </div>
+              <div className="watchlist-price">
+                <h3>₹{crop.price}</h3>
+                <button
+                  className="remove-watchlist"
+                  onClick={() => removeFromWatchlist(crop.id)}
+                >
+                  Remove ⭐
+                </button>
+              </div>
             </div>
-            <div className="watchlist-price">
-              <h3>₹{crop.price}</h3>
-              <span className={crop.percentage >= 0 ? "positive" : "negative"}>
-                {crop.percentage >= 0 ? "+" : ""}
-                {crop.percentage}%
-              </span>
-            </div>
-          </div>
-        ))}
-      </section>
+          ))}
+        </section>
+      )}
     </main>
   );
 }
