@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import Dashboard from "./pages/Dashboard";
 import Crops from "./pages/Crops";
 import Market from "./pages/Market";
@@ -15,6 +16,7 @@ function App() {
         <Route path="/market" element={<Market />} />
         <Route path="/watchlist" element={<Watchlist />} />
       </Routes>
+      <Footer />
     </BrowserRouter>
   );
 }

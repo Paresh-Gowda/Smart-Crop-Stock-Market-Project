@@ -547,3 +547,15 @@ nav {
   margin-bottom: 20px;
   font-size: 0.9rem;
 }
+.footer {
+  margin-top: 50px;
+  padding: 25px 20px;
+  text-align: center;
+  border-top: 1px solid #e5e7eb;
+  color: #6b7280;
+  font-size: 0.85rem;
+  background: #ffffff;
+}
+.footer p {
+  margin: 0;
+}
