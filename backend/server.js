@@ -22,13 +22,13 @@ app.get("/api/health", (req, res) => {
 app.get("/api/market-prices", async (req, res) => {
   try {
     const {
-      state,
-      district,
-      market,
-      commodity,
-      limit = 20,
-      offset = 0,
-    } = req.query;
+    state,
+    district,
+    market,
+    commodity,
+    limit = 20,
+    offset = 0,
+  } = req.query;
     const params = {
       "api-key": process.env.DATA_GOV_API_KEY,
       format: "json",
@@ -66,9 +66,11 @@ app.get("/api/market-prices", async (req, res) => {
       modalPrice: item.modal_price,
     }));
     res.json({
-      count: cleanData.length,
-      data: cleanData,
-    });
+    count: cleanData.length,
+    limit: Number(limit),
+    offset: Number(offset),
+    data: cleanData,
+  });
   } catch (error) {
     console.error("Mandi API Error:", error.message);
     res.status(500).json({
